@@ -1,0 +1,52 @@
+Author: Michael Clementi
+
+LOLMatchAnalysis.ipynb:
+    Tool used to access the API of Riot Games to analyze League of Legends match data (particularly Classic games) using scraping and data science techniques
+    Aims to find trends and correlations between each factor of games, and provide visuals to investigate the importance of gold income and feature priority
+
+Usage:
+    Make sure you have all required imports in your Python virtual environment before running
+    See *IMPORTANT NOTE down below
+
+    All data is taken from Riot Games Developer Tool: https://developer.riotgames.com/apis
+    Riot API Endpoints used:
+        AccountV1
+        SummonerV4
+        LeagueV4
+        MatchV5
+    
+    Running:
+        Main code begins after final defined function save_to_db
+
+        Initially: 
+            Wipes the 'league_data.db' for a fresh start when testing
+            Gets the top players on the solo queue ladder, then gets their matches
+                -> Change the 'top=' field when calling get_ladder to return the top # number of players requested
+                -> Change the 'matches=' field when calling get_top_matches to return the requested # of matches per top player
+                -> Change 'intervals' to get snapshots of gamestates at the requested minute intervals (recommended to start at 5 in five minute increments)
+                    -> It will then process match info and save all match/team/participant info of each match to the database 'league_data.db'
+
+        * Note that due to Riot Games's API limit, it may take a while to fetch a high amount of players and process a high number of games
+            -> The program will post live updates of player fetching and game processes to ensure it's running correctly
+
+        It will then get a requested player puuid from a player, as well as player puuids from recent players in the last _ # of matches
+            -> Change the 'matches=' field when calling get_average_players to get _ # players from the last rquest # of matches
+            -> Change the 'matches=' field when calling get_average_matches to get the recent _ # matches for every player return by get_average_players 
+
+                *IMPORTANT NOTE: get_average_players gives up to 9 players per match not including the seed puuid. Less if people are partied together for multiple games
+                    Due to working around API limits, this can VASTLY increase the run time with a moderate to high number of requested average players
+                    -> For reference, running:
+                        get_ladder(top=100) and then get_top_matches(ladder_df, matches=10) for ~1000 matches, then processing the matches
+                            -> takes about 50 minutes total (assumming every player has 10 recent matches all Classic Draft/Ranked games)
+                            -> From my testing this comes out to be ~750 matches for 35 minutes 
+                        get_average_players(puuid=personal_puuid, matches=12), and then get_average_matches(average_players, matches=10) to get a similar number as the top matches
+                            -> takes about the same amount of time, similar output
+                        * Use this as reference when determining the ideal number of matches you want to process
+                            A good starting point is 100 matches per ladder, which takes about 5 minutes
+
+        After getting top ranked matches and average ranked matches, the program will then find correlations between each major game feature and wins
+            Vizualizations of top teams/players vs average teams/players will be contructed to view importance of:
+                Team-wide objectives
+                Player-wide game features
+                Static gold differentials at certain timeframes
+                Dynamic game momentum at certain timeframes
