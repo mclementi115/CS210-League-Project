@@ -37,8 +37,8 @@ Usage:
                     Due to working around API limits, this can VASTLY increase the run time with a moderate to high number of requested average players
                     -> For reference, running:
                         get_ladder(top=100) and then get_top_matches(ladder_df, matches=10) for ~1000 matches, then processing the matches
-                            -> takes about 50 minutes total (assumming every player has 10 recent matches all Classic Draft/Ranked games)
-                            -> From my testing this comes out to be ~750 matches for 35 minutes 
+                            -> takes maximum 50 minutes total (assumming every player has 10 recent matches all Classic Draft/Ranked games)
+                            -> from my testing this comes out to be ~750 matches for 35 minutes 
                         get_average_players(puuid=personal_puuid, matches=12), and then get_average_matches(average_players, matches=10) to get a similar number as the top matches
                             -> takes about the same amount of time, similar output
                         * Use this as reference when determining the ideal number of matches you want to process
@@ -50,3 +50,4 @@ Usage:
                 Player-wide game features
                 Static gold differentials at certain timeframes
                 Dynamic game momentum at certain timeframes
+        A prediction model is included at the end to predit if games are wins using the conglomerate of both top and average team data
