@@ -5,8 +5,8 @@ LOLMatchAnalysis.ipynb:
     Aims to find trends and correlations between each factor of games, and provide visuals to investigate the importance of gold income and feature priority
 
 Usage:
+See *IMPORTANT NOTE down below before running
     Make sure you have all required imports in your Python virtual environment before running
-    See *IMPORTANT NOTE down below
 
     All data is taken from Riot Games Developer Tool: https://developer.riotgames.com/apis
     Riot API Endpoints used:
@@ -22,7 +22,7 @@ Usage:
             Wipes the 'league_data.db' for a fresh start when testing
             Gets the top players on the solo queue ladder, then gets their matches
                 -> Change the 'top=' field when calling get_ladder to return the top # number of players requested
-                -> Change the 'matches=' field when calling get_top_matches to return the requested # of matches per top player
+                -> Change the 'matches=' field when calling get_match_ids to return the requested # of matches per top player
                 -> Change 'intervals' to get snapshots of gamestates at the requested minute intervals (recommended to start at 5 in five minute increments)
                     -> It will then process match info and save all match/team/participant info of each match to the database 'league_data.db'
 
@@ -34,15 +34,26 @@ Usage:
             -> Change the 'matches=' field when calling get_average_matches to get the recent _ # matches for every player return by get_average_players 
 
                 *IMPORTANT NOTE: get_average_players gives up to 9 players per match not including the seed puuid. Less if people are partied together for multiple games
-                    Due to working around API limits, this can VASTLY increase the run time with a moderate to high number of requested average players
+                    Due to working around API limits, this can VASTLY increase the run time with a moderate to high number of requested matches in get_average_players
                     -> For reference, running:
-                        get_ladder(top=100) and then get_top_matches(ladder_df, matches=10) for ~1000 matches, then processing the matches
-                            -> takes maximum 50 minutes total (assumming every player has 10 recent matches all Classic Draft/Ranked games)
-                            -> from my testing this comes out to be ~750 matches for 35 minutes 
-                        get_average_players(puuid=personal_puuid, matches=12), and then get_average_matches(average_players, matches=10) to get a similar number as the top matches
+                        get_ladder(top=100)
+                        get_match_ids(ladder_df, matches=10) for ~1000 matches
+                        Then processing the matches:
+                            -> takes around 50 minutes total worst-case (assumming every player has 10 recent matches all Classic Draft/Ranked games)
+                            -> from my testing, this usually comes out to be ~750 matches for 35 minutes instead
+                        get_average_players(puuid=personal_puuid, matches=12)
+                        get_match_ids(average_players, matches=10) to get a similar number as the top matches above
                             -> takes about the same amount of time, similar output
+
                         * Use this as reference when determining the ideal number of matches you want to process
-                            A good starting point is 100 matches per ladder, which takes about 5 minutes
+                            A good starting point for testing with an ok sample size is 10 players and 10 matches per player in the ladder, which takes about 5 minutes
+                                This is the default for 10 player and 10 matches per player:
+                                -> get_ladder(top=10)
+                                -> get_match_ids(ladder_df, matches=10)
+                                -> get_average_players(puuid=personal_puuid, matches=12) 
+                                    -> round a little higher for average player matches as casual players usually play with the same people more often
+                                -> then get_match_ids(average_players, matches=10)
+
 
         After getting top ranked matches and average ranked matches, the program will then find correlations between each major game feature and wins
             Vizualizations of top teams/players vs average teams/players will be contructed to view importance of:
